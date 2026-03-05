@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
-  <script src="https://www.paypal.com/sdk/js?client-id=test&currency=EUR"></script>
 </head>
 
 <body>
@@ -59,43 +58,59 @@
       </section>
 
       <aside class="panel panel--shop" aria-label="Boutique">
-        <div class="panel__head">
-          <div>
-            <div class="panel__title">Boutique 💼</div>
-            <div class="panel__subtitle">Achète des bonus pour produire plus 😋.</div>
-          </div>
-          <div class="pill" id="total">Total: 0</div>
+        <!-- Navigation tabs -->
+        <div class="nav-tabs" id="navTabs">
+          <button type="button" class="nav-tab nav-tab--active" data-tab="upgrades">⚙️ Améliorations</button>
+          <button type="button" class="nav-tab" data-tab="boxes">📦 Achats</button>
+          <button type="button" class="nav-tab" data-tab="skins">🎨 Skins</button>
         </div>
 
-        <div class="shop" id="shop"></div>
-
-        <div class="gamble" aria-label="Skins et tirage">
+        <!-- TAB: Améliorations -->
+        <div class="tab-content tab-content--active" id="tabUpgrades" data-tab-content="upgrades">
           <div class="panel__head">
             <div>
-              <div class="panel__title">Skins 🎰</div>
-              <div class="panel__subtitle">
-                Box sélectionnée :
-                <span id="currentBoxLabel">🥉 Box Bronze</span>
-                — coût : <span id="gambleCost">2 000</span> 🍪
-              </div>
+              <div class="panel__title">Améliorations ⚙️</div>
+              <div class="panel__subtitle">Achète des bonus pour produire plus 😋</div>
+            </div>
+            <div class="pill" id="total">Total: 0</div>
+          </div>
+          <div class="shop" id="shop"></div>
+        </div>
+
+        <!-- TAB: Achats (Boxes) -->
+        <div class="tab-content" id="tabBoxes" data-tab-content="boxes">
+          <div class="panel__head">
+            <div>
+              <div class="panel__title">Lootbox 📦</div>
+              <div class="panel__subtitle">Clique sur une box pour voir son contenu et l'ouvrir</div>
             </div>
           </div>
           <div class="box-tabs" id="boxTabs">
-            <button type="button" class="box-tab box-tab--active" data-box-id="bronze">🥉 Bronze</button>
-            <button type="button" class="box-tab" data-box-id="silver">🥈 Argent</button>
-            <button type="button" class="box-tab" data-box-id="gold">🥇 Or</button>
-            <button type="button" class="box-tab box-tab--paid" data-box-id="paid"
-              style="color: #fbbf24; border-color: #fbbf24;">💎 Payante</button>
+            <button type="button" class="box-tab box-tab--active" data-box-id="bronze">
+              <span class="box-tab__icon">🥉</span> Bronze
+            </button>
+            <button type="button" class="box-tab" data-box-id="silver">
+              <span class="box-tab__icon">🥈</span> Argent
+            </button>
+            <button type="button" class="box-tab" data-box-id="gold">
+              <span class="box-tab__icon">🥇</span> Or
+            </button>
+            <button type="button" class="box-tab box-tab--vip" data-box-id="paid">
+              <span class="box-tab__icon">👑</span> VIP
+            </button>
           </div>
-          <button class="btn gamble__draw" id="btnGamble" type="button">
-            🎲 Ouvrir la box
-          </button>
-          <div id="paypal-button-container" style="display: none; margin-top: 1rem;"></div>
           <div class="gamble__result" id="gambleResult" aria-live="polite"></div>
-          <div class="skins">
-            <div class="skins__label">
-              Skins (du moins au plus rare — probas affichées pour la box de chaque skin, les non débloqués sont grisés)
+        </div>
+
+        <!-- TAB: Skins -->
+        <div class="tab-content" id="tabSkins" data-tab-content="skins">
+          <div class="panel__head">
+            <div>
+              <div class="panel__title">Skins 🎨</div>
+              <div class="panel__subtitle">Clique sur un skin débloqué pour l'équiper</div>
             </div>
+          </div>
+          <div class="skins">
             <div class="skins__list" id="skinsList"></div>
           </div>
         </div>
@@ -109,23 +124,28 @@
             <div class="footer__label">Hors‑ligne ajouté ⏳</div>
             <div class="footer__value" id="offlineGain">—</div>
           </div>
-          <div class="footer__note">
-            Astuce 💡: la progression est stockée dans ton navigateur (localStorage).
-          </div>
         </div>
       </aside>
     </main>
   </div>
 
+  <!-- Hidden gamble button for JS logic -->
+  <button id="btnGamble" type="button" style="display:none"></button>
+
   <div class="gamble-modal" id="gambleModal" aria-hidden="true">
     <div class="gamble-modal__backdrop"></div>
     <div class="gamble-modal__box">
-      <div class="gamble-modal__title">🎰 Tirage en cours...</div>
-      <div class="gamble-modal__reel">
-        <div class="gamble-modal__emoji" id="gambleReelEmoji">🍪</div>
+      <div class="gamble-modal__title">Tirage en cours...</div>
+
+      <div class="gamble-modal__window" id="gambleWindow">
+        <div class="gamble-modal__track" id="gambleTrack"></div>
+        <div class="gamble-modal__cursor"></div>
       </div>
+
       <div class="gamble-modal__result" id="gambleModalResult"></div>
-      <button class="btn gamble-modal__close" id="gambleModalClose" type="button">Fermer</button>
+      <button class="btn gamble-modal__close" id="gambleModalClose" type="button">
+        Continuer
+      </button>
     </div>
   </div>
 
