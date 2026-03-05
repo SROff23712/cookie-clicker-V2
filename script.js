@@ -701,11 +701,11 @@ function load() {
         ? Math.max(0, state.lastLoadedAt - state.lastSave)
         : 0;
     const offlineSec = offlineMs / 1000;
-    const offlineGain = getCps() * offlineSec;
+    const offlineGain = getCps() * offlineSec * 0.2; // Gain AFK réduit à 20%
     if (offlineGain > 0.01) {
       addCookies(offlineGain);
       state.lastOfflineGain = offlineGain;
-      setHint(`+${fmt.format(Math.floor(offlineGain))} cookies hors‑ligne.`);
+      setHint(`+${fmt.format(Math.floor(offlineGain))} cookies hors‑ligne (taux 20%).`);
     } else {
       state.lastOfflineGain = 0;
     }
