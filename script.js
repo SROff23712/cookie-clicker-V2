@@ -866,13 +866,12 @@ function setHint(text) {
   el.textContent = text ?? "";
 }
 
-function floatText(anchorEl, text) {
-  const rect = anchorEl.getBoundingClientRect();
+function floatText(x, y, text) {
   const el = document.createElement("div");
   el.className = "float";
   el.textContent = text;
-  el.style.left = `${rect.left + rect.width / 2}px`;
-  el.style.top = `${rect.top + rect.height / 2}px`;
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
   el.style.transform = "translate(-50%, -20px) scale(0.98)";
   el.style.opacity = "0";
   document.body.appendChild(el);
@@ -1257,10 +1256,10 @@ function init() {
   const btnReset = document.getElementById("btnReset");
 
   if (cookieBtn) {
-    cookieBtn.addEventListener("click", () => {
+    cookieBtn.addEventListener("click", (e) => {
       const gain = getCpc();
       addCookies(gain);
-      floatText(cookieBtn, `+${fmt.format(gain)}`);
+      floatText(e.clientX, e.clientY, `+${fmt.format(gain)}`);
       saveDebounced();
       render();
     });
