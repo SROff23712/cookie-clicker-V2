@@ -144,8 +144,9 @@ body {
 
 .panel--cookie {
   align-items: center;
-  gap: 12px;
-  justify-content: center;
+  gap: 18px;
+  justify-content: flex-start;
+  padding-top: 40px;
 }
 
 .panel--shop {
@@ -256,7 +257,12 @@ body {
 
 .cookie__emoji {
   font-size: clamp(80px, 18vw, 140px);
+  width: clamp(80px, 18vw, 140px);
+  height: clamp(80px, 18vw, 140px);
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   filter: drop-shadow(0 8px 24px rgba(0, 0, 0, .35));
   transition: transform .1s ease;
 }
@@ -401,6 +407,89 @@ body {
   font-size: 12px
 }
 
+/* Box grid (Achats tab) */
+.box-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 4px 0 12px;
+}
+
+.box-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 10px;
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  background: rgba(0, 0, 0, .18);
+  cursor: pointer;
+  transition: transform .1s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.box-card:hover {
+  background: rgba(255, 255, 255, .06);
+  border-color: rgba(139, 92, 246, .5);
+  box-shadow: 0 0 18px rgba(139, 92, 246, .15);
+  transform: translateY(-2px);
+}
+
+.box-card:active {
+  transform: scale(.97) translateY(0);
+}
+
+.box-card--active {
+  border-color: var(--accent);
+  background: rgba(139, 92, 246, .12);
+  box-shadow: 0 0 20px rgba(139, 92, 246, .2);
+}
+
+.box-card--vip {
+  border-color: rgba(251, 191, 36, .45);
+  background: rgba(251, 191, 36, .07);
+}
+
+.box-card--vip.box-card--active {
+  border-color: #fbbf24;
+  background: rgba(251, 191, 36, .15);
+  box-shadow: 0 0 20px rgba(251, 191, 36, .2);
+}
+
+.box-card--vip:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 0 18px rgba(251, 191, 36, .2);
+}
+
+.box-card__img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .4));
+  transition: transform .2s ease;
+}
+
+.box-card:hover .box-card__img {
+  transform: scale(1.08) rotate(-2deg);
+}
+
+.box-card__name {
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.box-card__price {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.box-card--vip .box-card__price {
+  color: #fbbf24;
+}
+
+
 .footer {
   margin-top: 14px;
   border-top: 1px solid var(--border);
@@ -409,6 +498,7 @@ body {
   flex-direction: column;
   gap: 8px;
 }
+
 
 .footer__row {
   display: flex;
@@ -553,7 +643,13 @@ body {
 }
 
 .skin-card__emoji {
-  font-size: 24px;
+  font-size: 28px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   line-height: 1
 }
 

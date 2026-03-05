@@ -1,4 +1,4 @@
-const STORAGE_KEY = "mini_cookie_clicker_save_v1";
+﻿const STORAGE_KEY = "mini_cookie_clicker_save_v1";
 
 const fmt = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
 const fmt1 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
@@ -310,13 +310,15 @@ const UPGRADE_DEFS = [
 const RARITY_ORDER = { common: 0, rare: 1, epic: 2, legendary: 3 };
 
 // Chaque skin appartient à UNE box et a un "poids" pour le tirage dans cette box.
-// Les poids de chaque box font 4000 au total -> le skin le plus rare (poids 1) ≈ 1 / 4000 = 0,025 %.
 const SKIN_DEFS = [
+  // Default cookie (Not in any lootbox, you start with it)
+  { id: "default", img: "assets/cookie.png", name: "Cookie classique", rarity: "common", boxId: null, weight: 0 },
+
   // Box Bronze
-  { id: "default", emoji: "🍪", name: "Cookie classique", rarity: "common", boxId: "bronze", weight: 1500 },
-  { id: "chocolate", emoji: "🍫", name: "Chocolat", rarity: "common", boxId: "bronze", weight: 1200 },
-  { id: "candy", emoji: "🍬", name: "Bonbon", rarity: "common", boxId: "bronze", weight: 800 },
-  { id: "donut", emoji: "🍩", name: "Donut", rarity: "rare", boxId: "bronze", weight: 499 },
+  { id: "chocolate", emoji: "🍫", name: "Chocolat", rarity: "common", boxId: "bronze", weight: 1500 },
+  { id: "candy", emoji: "🍬", name: "Bonbon", rarity: "common", boxId: "bronze", weight: 1200 },
+  { id: "donut", emoji: "🍩", name: "Donut", rarity: "rare", boxId: "bronze", weight: 800 },
+  { id: "waffle", emoji: "🧇", name: "Gaufre", rarity: "epic", boxId: "bronze", weight: 499 },
   { id: "bronzeStar", emoji: "🌟", name: "Étoile de bronze", rarity: "legendary", boxId: "bronze", weight: 1 },
 
   // Box Argent
@@ -341,10 +343,10 @@ const SKIN_DEFS = [
 ];
 
 const BOX_DEFS = [
-  { id: "bronze", name: "Box Bronze", icon: "🥉", price: 2000 },
-  { id: "silver", name: "Box Argent", icon: "🥈", price: 6000 },
-  { id: "gold", name: "Box Or", icon: "🥇", price: 15000 },
-  { id: "paid", name: "VIP Box", icon: "�", price: "0.99€", isPaid: true },
+  { id: "bronze", name: "Common Box", icon: "🥉", img: "assets/common.png", price: 2000 },
+  { id: "silver", name: "Uncommon Box", icon: "🥈", img: "assets/uncommon.png", price: 6000 },
+  { id: "gold", name: "Epic Box", icon: "🥇", img: "assets/epic.png", price: 15000 },
+  { id: "paid", name: "VIP Box", icon: "👑", img: "assets/VIP.png", price: "0.99€", isPaid: true },
 ];
 
 const state = {
@@ -401,8 +403,12 @@ function getBoxPrice(id) {
   return getBoxById(id).price;
 }
 
-function getSkinEmoji(skinId) {
-  return getSkinById(skinId).emoji;
+function getSkinIconHTML(skinId) {
+  const s = getSkinById(skinId);
+  if (s.img) {
+    return `<img src="${s.img}" alt="${s.name}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,.35))">`;
+  }
+  return s.emoji;
 }
 
 function getBoxTotalWeight(boxId) {
@@ -485,7 +491,12 @@ function runGambleAnimation(wonSkin, currentBoxId, onComplete) {
     el.className = `gamble-modal__item gamble-modal__item--${s.rarity}`;
 
     const emojiEl = document.createElement("div");
-    emojiEl.textContent = s.emoji;
+    if (s.img) {
+      // Need smaller drop shadow for gamble modal item
+      emojiEl.innerHTML = `<img src="${s.img}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))">`;
+    } else {
+      emojiEl.textContent = s.emoji;
+    }
 
     const nameEl = document.createElement("div");
     nameEl.className = "gamble-modal__item-name";
@@ -915,8 +926,8 @@ function showBoxInfoPopup(boxId) {
         if (!alreadyHad) state.unlockedSkins.push(won.id);
         state.currentSkinId = won.id;
         const msg = alreadyHad
-          ? `Clé validée ! Tu as tiré ${won.emoji} ${won.name} (déjà possédé) — équipé !`
-          : `Clé validée ! Nouveau skin exclusif: ${won.emoji} ${won.name} !`;
+          ? `Clé validée ! Tu as tiré ${won.emoji || ""} ${won.name} (déjà possédé) — équipé !`
+          : `Clé validée ! Nouveau skin exclusif: ${won.emoji || ""} ${won.name} !`;
         setHint(msg);
 
         const gResult = document.getElementById("gambleResult");
@@ -1049,7 +1060,7 @@ function render() {
       state.lastOfflineGain == null ? "—" : `+${fmtShort(Math.floor(state.lastOfflineGain))}`;
 
   const cookieEmojiEl = document.getElementById("cookieEmoji");
-  if (cookieEmojiEl) cookieEmojiEl.textContent = getSkinEmoji(state.currentSkinId);
+  if (cookieEmojiEl) cookieEmojiEl.innerHTML = getSkinIconHTML(state.currentSkinId);
 
   // The box tabs and VIP popup handle everything now; btnGamble is hidden.
 
@@ -1112,8 +1123,12 @@ function buildSkinsList() {
       (isUnlocked ? "" : " skin-card--locked");
     card.disabled = !isUnlocked;
     const prob = formatProbabilityForSkin(skin);
+    const iconHTML = skin.img
+      ? `<img src="${skin.img}" alt="${skin.name}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))">`
+      : skin.emoji;
+
     card.innerHTML = `
-      <span class="skin-card__emoji">${skin.emoji}</span>
+      <span class="skin-card__emoji">${iconHTML}</span>
       <div class="skin-card__info">
         <div class="skin-card__name">${skin.name}</div>
         <div class="skin-card__rarity skin-card__rarity--${skin.rarity}">${skin.rarity}</div>
@@ -1123,7 +1138,7 @@ function buildSkinsList() {
       e.preventDefault();
       if (!(state.unlockedSkins || ["default"]).includes(id)) return;
       state.currentSkinId = id;
-      setHint(`Skin équipé: ${skin.name} ${skin.emoji}`);
+      setHint(`Skin équipé: ${skin.name} ${skin.emoji || ""}`);
       saveDebounced();
       render();
     });
@@ -1206,8 +1221,8 @@ function init() {
           if (!alreadyHad) state.unlockedSkins.push(won.id);
           state.currentSkinId = won.id;
           const msg = alreadyHad
-            ? `Tu as tiré ${won.emoji} ${won.name} (déjà possédé) — équipé !`
-            : `Nouveau skin débloqué: ${won.emoji} ${won.name} !`;
+            ? `Tu as tiré ${won.emoji || won.name} (déjà possédé) — équipé !`
+            : `Nouveau skin débloqué: ${won.emoji || won.name} !`;
           setHint(msg);
 
           if (gambleResult) gambleResult.textContent = msg;
@@ -1266,7 +1281,7 @@ function init() {
       if (!boxId) return;
       state.currentBoxId = boxId;
       for (const child of boxTabs.children) {
-        child.classList.toggle("box-tab--active", child === target);
+        child.classList.toggle("box-card--active", child === target);
       }
       render();
       showBoxInfoPopup(boxId);
@@ -1294,3 +1309,4 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+

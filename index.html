@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
-</head>
+<script>window.onerror = function(m, s, l, c, e) { alert(Error:  at line \); };</script></head>
 
 <body>
   <div class="app">
@@ -85,18 +85,26 @@
               <div class="panel__subtitle">Clique sur une box pour voir son contenu et l'ouvrir</div>
             </div>
           </div>
-          <div class="box-tabs" id="boxTabs">
-            <button type="button" class="box-tab box-tab--active" data-box-id="bronze">
-              <span class="box-tab__icon">🥉</span> Bronze
+          <div class="box-grid" id="boxTabs">
+            <button type="button" class="box-card box-card--active" data-box-id="bronze">
+              <img src="assets/common.png" alt="Common Box" class="box-card__img" />
+              <div class="box-card__name">Common Box</div>
+              <div class="box-card__price">2 K 🍪</div>
             </button>
-            <button type="button" class="box-tab" data-box-id="silver">
-              <span class="box-tab__icon">🥈</span> Argent
+            <button type="button" class="box-card" data-box-id="silver">
+              <img src="assets/uncommon.png" alt="Uncommon Box" class="box-card__img" />
+              <div class="box-card__name">Uncommon Box</div>
+              <div class="box-card__price">6 K 🍪</div>
             </button>
-            <button type="button" class="box-tab" data-box-id="gold">
-              <span class="box-tab__icon">🥇</span> Or
+            <button type="button" class="box-card" data-box-id="gold">
+              <img src="assets/epic.png" alt="Epic Box" class="box-card__img" />
+              <div class="box-card__name">Epic Box</div>
+              <div class="box-card__price">15 K 🍪</div>
             </button>
-            <button type="button" class="box-tab box-tab--vip" data-box-id="paid">
-              <span class="box-tab__icon">👑</span> VIP
+            <button type="button" class="box-card box-card--vip" data-box-id="paid">
+              <img src="assets/VIP.png" alt="VIP Box" class="box-card__img" />
+              <div class="box-card__name">VIP Box</div>
+              <div class="box-card__price">0.99€ 💳</div>
             </button>
           </div>
           <div class="gamble__result" id="gambleResult" aria-live="polite"></div>
