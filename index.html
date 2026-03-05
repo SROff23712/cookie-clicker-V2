@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cookie Clicker (mini)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand__dot" aria-hidden="true"></span>
+          <div class="brand__text">
+            <div class="brand__title">Cookie Clicker 🍪</div>
+            <div class="brand__sub">mini version — sauvegarde auto 💾</div>
+          </div>
+        </div>
+
+        <div class="topbar__right">
+          <button class="btn btn--ghost" id="btnSave" type="button" title="Sauvegarder">
+            Sauvegarder
+          </button>
+          <button class="btn btn--danger" id="btnReset" type="button" title="Réinitialiser">
+            Reset
+          </button>
+        </div>
+      </header>
+
+      <main class="grid">
+        <section class="panel panel--cookie" aria-label="Zone de clic">
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__label">Cookies 🍪</div>
+              <div class="stat__value" id="cookies">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">Par seconde ⏱️</div>
+              <div class="stat__value" id="cps">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat__label">Par clic 👉</div>
+              <div class="stat__value" id="cpc">1</div>
+            </div>
+          </div>
+
+          <button class="cookie cookie--emoji" id="cookieBtn" type="button" aria-label="Cliquer le cookie">
+            <span class="cookie__emoji" id="cookieEmoji">🍪</span>
+            <span class="cookie__label">CLIQUE</span>
+          </button>
+
+          <div class="hint" id="hint" aria-live="polite"></div>
+        </section>
+
+        <aside class="panel panel--shop" aria-label="Boutique">
+          <div class="panel__head">
+            <div>
+              <div class="panel__title">Boutique 💼</div>
+              <div class="panel__subtitle">Achète des bonus pour produire plus 😋.</div>
+            </div>
+            <div class="pill" id="total">Total: 0</div>
+          </div>
+
+          <div class="shop" id="shop"></div>
+
+          <div class="gamble" aria-label="Skins et tirage">
+            <div class="panel__head">
+              <div>
+                <div class="panel__title">Skins 🎰</div>
+                <div class="panel__subtitle">
+                  Box sélectionnée :
+                  <span id="currentBoxLabel">🥉 Box Bronze</span>
+                  — coût : <span id="gambleCost">2 000</span> 🍪
+                </div>
+              </div>
+            </div>
+            <div class="box-tabs" id="boxTabs">
+              <button type="button" class="box-tab box-tab--active" data-box-id="bronze">🥉 Bronze</button>
+              <button type="button" class="box-tab" data-box-id="silver">🥈 Argent</button>
+              <button type="button" class="box-tab" data-box-id="gold">🥇 Or</button>
+            </div>
+            <button class="btn gamble__draw" id="btnGamble" type="button">
+              🎲 Ouvrir la box
+            </button>
+            <div class="gamble__result" id="gambleResult" aria-live="polite"></div>
+            <div class="skins">
+              <div class="skins__label">
+                Skins (du moins au plus rare — probas affichées pour la box de chaque skin, les non débloqués sont grisés)
+              </div>
+              <div class="skins__list" id="skinsList"></div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <div class="footer__row">
+              <div class="footer__label">Dernière sauvegarde 💾</div>
+              <div class="footer__value" id="lastSave">—</div>
+            </div>
+            <div class="footer__row">
+              <div class="footer__label">Hors‑ligne ajouté ⏳</div>
+              <div class="footer__value" id="offlineGain">—</div>
+            </div>
+            <div class="footer__note">
+              Astuce 💡: la progression est stockée dans ton navigateur (localStorage).
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div class="gamble-modal" id="gambleModal" aria-hidden="true">
+      <div class="gamble-modal__backdrop"></div>
+      <div class="gamble-modal__box">
+        <div class="gamble-modal__title">🎰 Tirage en cours...</div>
+        <div class="gamble-modal__reel">
+          <div class="gamble-modal__emoji" id="gambleReelEmoji">🍪</div>
+        </div>
+        <div class="gamble-modal__result" id="gambleModalResult"></div>
+        <button class="btn gamble-modal__close" id="gambleModalClose" type="button">Fermer</button>
+      </div>
+    </div>
+
+    <script src="./script.js" defer></script>
+  </body>
+</html>
