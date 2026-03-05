@@ -133,31 +133,37 @@ const RARITY_ORDER = { common: 0, rare: 1, epic: 2, legendary: 3 };
 // Les poids de chaque box font 4000 au total -> le skin le plus rare (poids 1) ≈ 1 / 4000 = 0,025 %.
 const SKIN_DEFS = [
   // Box Bronze
-  { id: "default",  emoji: "🍪", name: "Cookie classique", rarity: "common",    boxId: "bronze", weight: 1500 },
-  { id: "chocolate",emoji: "🍫", name: "Chocolat",         rarity: "common",    boxId: "bronze", weight: 1200 },
-  { id: "candy",    emoji: "🍬", name: "Bonbon",           rarity: "common",    boxId: "bronze", weight: 800  },
-  { id: "donut",    emoji: "🍩", name: "Donut",            rarity: "rare",      boxId: "bronze", weight: 499  },
-  { id: "bronzeStar",emoji:"🌟", name: "Étoile de bronze", rarity: "legendary", boxId: "bronze", weight: 1    },
+  { id: "default", emoji: "🍪", name: "Cookie classique", rarity: "common", boxId: "bronze", weight: 1500 },
+  { id: "chocolate", emoji: "🍫", name: "Chocolat", rarity: "common", boxId: "bronze", weight: 1200 },
+  { id: "candy", emoji: "🍬", name: "Bonbon", rarity: "common", boxId: "bronze", weight: 800 },
+  { id: "donut", emoji: "🍩", name: "Donut", rarity: "rare", boxId: "bronze", weight: 499 },
+  { id: "bronzeStar", emoji: "🌟", name: "Étoile de bronze", rarity: "legendary", boxId: "bronze", weight: 1 },
 
   // Box Argent
-  { id: "cupcake",  emoji: "🧁", name: "Cupcake",          rarity: "common",    boxId: "silver", weight: 1500 },
-  { id: "honey",    emoji: "🍯", name: "Miel",             rarity: "rare",      boxId: "silver", weight: 1200 },
-  { id: "moon",     emoji: "🌙", name: "Lune",             rarity: "rare",      boxId: "silver", weight: 800  },
-  { id: "star",     emoji: "⭐", name: "Étoile",           rarity: "epic",      boxId: "silver", weight: 499  },
-  { id: "silverStar",emoji:"✨", name: "Étoile d’argent",  rarity: "legendary", boxId: "silver", weight: 1    },
+  { id: "cupcake", emoji: "🧁", name: "Cupcake", rarity: "common", boxId: "silver", weight: 1500 },
+  { id: "honey", emoji: "🍯", name: "Miel", rarity: "rare", boxId: "silver", weight: 1200 },
+  { id: "moon", emoji: "🌙", name: "Lune", rarity: "rare", boxId: "silver", weight: 800 },
+  { id: "star", emoji: "⭐", name: "Étoile", rarity: "epic", boxId: "silver", weight: 499 },
+  { id: "silverStar", emoji: "✨", name: "Étoile d’argent", rarity: "legendary", boxId: "silver", weight: 1 },
 
   // Box Or
-  { id: "fire",     emoji: "🔥", name: "Feu",              rarity: "rare",      boxId: "gold",   weight: 1500 },
-  { id: "rainbow",  emoji: "🌈", name: "Arc-en-ciel",      rarity: "epic",      boxId: "gold",   weight: 1200 },
-  { id: "diamond",  emoji: "💎", name: "Diamant",          rarity: "epic",      boxId: "gold",   weight: 800  },
-  { id: "galaxy",   emoji: "🌌", name: "Galaxie",          rarity: "epic",      boxId: "gold",   weight: 499  },
-  { id: "golden",   emoji: "👑", name: "Golden Cookie",    rarity: "legendary", boxId: "gold",   weight: 1    },
+  { id: "fire", emoji: "🔥", name: "Feu", rarity: "rare", boxId: "gold", weight: 1500 },
+  { id: "rainbow", emoji: "🌈", name: "Arc-en-ciel", rarity: "epic", boxId: "gold", weight: 1200 },
+  { id: "diamond", emoji: "💎", name: "Diamant", rarity: "epic", boxId: "gold", weight: 800 },
+  { id: "galaxy", emoji: "🌌", name: "Galaxie", rarity: "epic", boxId: "gold", weight: 499 },
+  { id: "golden", emoji: "👑", name: "Golden Cookie", rarity: "legendary", boxId: "gold", weight: 1 },
+
+  // Box Payante
+  { id: "mult2", emoji: "2️⃣", name: "Multiplicateur X2", rarity: "epic", boxId: "paid", weight: 60, multiplier: 2 },
+  { id: "mult3", emoji: "3️⃣", name: "Multiplicateur X3", rarity: "epic", boxId: "paid", weight: 35, multiplier: 3 },
+  { id: "mult5", emoji: "5️⃣", name: "Multiplicateur X5", rarity: "legendary", boxId: "paid", weight: 5, multiplier: 5 },
 ];
 
 const BOX_DEFS = [
   { id: "bronze", name: "Box Bronze", icon: "🥉", price: 2000 },
   { id: "silver", name: "Box Argent", icon: "🥈", price: 6000 },
-  { id: "gold",   name: "Box Or",     icon: "🥇", price: 15000 },
+  { id: "gold", name: "Box Or", icon: "🥇", price: 15000 },
+  { id: "paid", name: "Box Payante", icon: "💎", price: "0.99€", isPaid: true },
 ];
 
 const state = {
@@ -179,7 +185,8 @@ function getCpc() {
     const owned = state.upgrades[u.id]?.owned ?? 0;
     if (u.type === "cpc") cpc += owned * u.value;
   }
-  return cpc;
+  const currentSkin = getSkinById(state.currentSkinId);
+  return cpc * (currentSkin.multiplier || 1);
 }
 
 function getCps() {
@@ -188,7 +195,8 @@ function getCps() {
     const owned = state.upgrades[u.id]?.owned ?? 0;
     if (u.type === "cps") cps += owned * u.value;
   }
-  return cps;
+  const currentSkin = getSkinById(state.currentSkinId);
+  return cps * (currentSkin.multiplier || 1);
 }
 
 function getSkinById(id) {
@@ -655,12 +663,23 @@ function render() {
 
   const currentBox = getBoxById(state.currentBoxId);
   const gambleCostEl = document.getElementById("gambleCost");
-  if (gambleCostEl) gambleCostEl.textContent = fmt.format(getBoxPrice(currentBox.id));
+  if (gambleCostEl) gambleCostEl.textContent = currentBox.isPaid ? currentBox.price : fmt.format(getBoxPrice(currentBox.id));
   const currentBoxLabel = document.getElementById("currentBoxLabel");
   if (currentBoxLabel)
     currentBoxLabel.textContent = `${currentBox.icon} ${currentBox.name}`;
   const btnGamble = document.getElementById("btnGamble");
-  if (btnGamble) btnGamble.disabled = !canAfford(getBoxPrice(currentBox.id));
+  const paypalContainer = document.getElementById("paypal-button-container");
+
+  if (currentBox.isPaid) {
+    if (btnGamble) btnGamble.style.display = "none";
+    if (paypalContainer) paypalContainer.style.display = "block";
+  } else {
+    if (btnGamble) {
+      btnGamble.style.display = "block";
+      btnGamble.disabled = !canAfford(getBoxPrice(currentBox.id));
+    }
+    if (paypalContainer) paypalContainer.style.display = "none";
+  }
 
   // refresh shop (costs + disabled state + owned)
   const shop = document.getElementById("shop");
@@ -800,13 +819,26 @@ function init() {
   if (btnGamble) {
     btnGamble.addEventListener("click", () => {
       const box = getBoxById(state.currentBoxId);
-      const price = getBoxPrice(box.id);
-      if (!canAfford(price)) {
-        setHint(`Pas assez de cookies pour ouvrir ${box.icon} ${box.name}.`);
-        if (gambleResult) gambleResult.textContent = "";
+      if (box.isPaid) {
+        // --- REMPLACE CE LIEN PAR TON VRAI LIEN STRIPE ---
+        const stripeLink = "https://buy.stripe.com/test_6oU00j4zW9zLb5i49sbII00";
+
+        if (stripeLink === "https://buy.stripe.com/test_6oU00j4zW9zLb5i49sbII00") {
+          alert("Tu dois d'abord remplacer 'LIEN_STRIPE_ICI' par ton vrai lien de paiement Stripe dans le code source de script.js (ligne ~824) ! N'oublie pas de configurer la redirection vers https://sroff-clicker.vercel.app/?payment=success dans Stripe.");
+        } else {
+          window.location.href = stripeLink;
+        }
         return;
+      } else {
+        const price = getBoxPrice(box.id);
+        if (!canAfford(price)) {
+          setHint(`Pas assez de cookies pour ouvrir ${box.icon} ${box.name}.`);
+          if (gambleResult) gambleResult.textContent = "";
+          return;
+        }
+        spendCookies(price);
       }
-      spendCookies(price);
+
       const won = drawRandomSkinFromBox(box.id);
       runGambleAnimation(won, () => {
         const alreadyHad = state.unlockedSkins.includes(won.id);
@@ -826,6 +858,36 @@ function init() {
       });
     });
   }
+
+  function handleStripeSuccess() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("payment") === "success") {
+      // Nettoyer l'URL localement pour éviter de refaire l'animation au F5
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      // Attendre un petit peu que l'UI soit chargée
+      setTimeout(() => {
+        const won = drawRandomSkinFromBox("paid");
+        runGambleAnimation(won, () => {
+          const alreadyHad = state.unlockedSkins.includes(won.id);
+          if (!alreadyHad) state.unlockedSkins.push(won.id);
+          state.currentSkinId = won.id;
+          const msg = alreadyHad
+            ? `Merci pour l'achat ! Tu as tiré ${won.emoji} ${won.name} (déjà possédé) — équipé !`
+            : `Merci pour l'achat ! Nouveau skin exclusif: ${won.emoji} ${won.name} !`;
+          setHint(msg);
+          if (gambleResult) gambleResult.textContent = msg;
+          if (modalResult) modalResult.textContent = msg;
+          if (modal) modal.classList.add("is-open");
+          if (modalClose) modalClose.style.display = "";
+          saveDebounced();
+          buildSkinsList();
+          render();
+        });
+      }, 600);
+    }
+  }
+  handleStripeSuccess();
 
   function closeGambleModal() {
     if (modal) modal.classList.remove("is-open");
