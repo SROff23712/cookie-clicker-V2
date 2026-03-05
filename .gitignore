@@ -1,0 +1,14 @@
+# Env
+.env
+.env.local
+.env*.local
+
+# Keys (ne jamais commit !)
+keys.json
+
+# Node
+node_modules/
+
+# Vercel
+.vercel/
+.vercel

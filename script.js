@@ -876,17 +876,32 @@ function showBoxInfoPopup(boxId) {
       }
 
       const hashed = await hashKey(keyVal);
-      if (state.usedKeys.includes(hashed)) {
-        setHint("❌ Cette clé a déjà été utilisée !");
+
+      // Call the server to validate & consume the key globally
+      let serverOk = false;
+      let serverError = "Erreur réseau, réessaye.";
+      try {
+        const resp = await fetch("/api/redeem", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ keyHash: hashed }),
+        });
+        const data = await resp.json();
+        if (data.ok) {
+          serverOk = true;
+        } else {
+          serverError = data.error || "Clé invalide.";
+        }
+      } catch (e) {
+        serverError = "Erreur réseau, vérifie ta connexion.";
+      }
+
+      if (!serverOk) {
+        setHint(`❌ ${serverError}`);
         return;
       }
 
-      if (!VALID_KEY_HASHES.includes(hashed)) {
-        setHint("❌ Clé invalide !");
-        return;
-      }
-
-      // Valid key logic
+      // Key accepted by server — award the prize
       state.usedKeys.push(hashed);
       saveDebounced();
       modal.remove();
