@@ -1,4 +1,4 @@
-﻿const STORAGE_KEY = "mini_cookie_clicker_save_v1";
+const STORAGE_KEY = "sroff_clicker_save_v1";
 
 const fmt = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
 const fmt1 = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
@@ -13,7 +13,7 @@ const SUFFIXES = [
   { value: 1e3, label: "K" },
 ];
 
-function fmtShort(n) {
+function fmtShort(n, decimals = 0) {
   if (!Number.isFinite(n)) return "0";
   const abs = Math.abs(n);
   for (const s of SUFFIXES) {
@@ -21,6 +21,9 @@ function fmtShort(n) {
       const val = n / s.value;
       return (val >= 100 ? Math.floor(val) : val.toFixed(1).replace(/\.0$/, "")) + " " + s.label;
     }
+  }
+  if (n > 0 && n < 10 && decimals > 0) {
+    return n.toFixed(decimals).replace(/\.0$/, "");
   }
   return fmt.format(Math.floor(n));
 }
@@ -310,15 +313,13 @@ const UPGRADE_DEFS = [
 const RARITY_ORDER = { common: 0, rare: 1, epic: 2, legendary: 3 };
 
 // Chaque skin appartient à UNE box et a un "poids" pour le tirage dans cette box.
+// Les poids de chaque box font 4000 au total -> le skin le plus rare (poids 1) ≈ 1 / 4000 = 0,025 %.
 const SKIN_DEFS = [
-  // Default cookie (Not in any lootbox, you start with it)
-  { id: "default", img: "assets/cookie.png", name: "Cookie classique", rarity: "common", boxId: null, weight: 0 },
-
   // Box Bronze
-  { id: "chocolate", emoji: "🍫", name: "Chocolat", rarity: "common", boxId: "bronze", weight: 1500 },
-  { id: "candy", emoji: "🍬", name: "Bonbon", rarity: "common", boxId: "bronze", weight: 1200 },
-  { id: "donut", emoji: "🍩", name: "Donut", rarity: "rare", boxId: "bronze", weight: 800 },
-  { id: "waffle", emoji: "🧇", name: "Gaufre", rarity: "epic", boxId: "bronze", weight: 499 },
+  { id: "default", emoji: "🍪", name: "Cookie classique", rarity: "common", boxId: "bronze", weight: 1500 },
+  { id: "chocolate", emoji: "🍫", name: "Chocolat", rarity: "common", boxId: "bronze", weight: 1200 },
+  { id: "candy", emoji: "🍬", name: "Bonbon", rarity: "common", boxId: "bronze", weight: 800 },
+  { id: "donut", emoji: "🍩", name: "Donut", rarity: "rare", boxId: "bronze", weight: 499 },
   { id: "bronzeStar", emoji: "🌟", name: "Étoile de bronze", rarity: "legendary", boxId: "bronze", weight: 1 },
 
   // Box Argent
@@ -336,10 +337,10 @@ const SKIN_DEFS = [
   { id: "golden", emoji: "👑", name: "Golden Cookie", rarity: "legendary", boxId: "gold", weight: 1 },
 
   // VIP Box
-  { id: "mult2", emoji: "2️⃣", name: "Multiplicateur X2", rarity: "epic", boxId: "paid", weight: 1200, multiplier: 2 },
-  { id: "mult3", emoji: "3️⃣", name: "Multiplicateur X3", rarity: "epic", boxId: "paid", weight: 700, multiplier: 3 },
-  { id: "mult5", emoji: "5️⃣", name: "Multiplicateur X5", rarity: "legendary", boxId: "paid", weight: 99.5, multiplier: 5 },
-  { id: "mult25", emoji: "🌟", name: "Multiplicateur X25", rarity: "legendary", boxId: "paid", weight: 0.5, multiplier: 25 },
+  { id: "mult2", emoji: "2️⃣", name: "Multiplicateur", rarity: "epic", boxId: "paid", weight: 1200, multiplier: 2 },
+  { id: "mult3", emoji: "3️⃣", name: "Multiplicateur", rarity: "epic", boxId: "paid", weight: 700, multiplier: 3 },
+  { id: "mult5", emoji: "5️⃣", name: "Multiplicateur", rarity: "legendary", boxId: "paid", weight: 99.5, multiplier: 5 },
+  { id: "mult25", emoji: "🌟", name: "Multiplicateur", rarity: "legendary", boxId: "paid", weight: 0.5, multiplier: 25 },
 ];
 
 const BOX_DEFS = [
@@ -403,12 +404,8 @@ function getBoxPrice(id) {
   return getBoxById(id).price;
 }
 
-function getSkinIconHTML(skinId) {
-  const s = getSkinById(skinId);
-  if (s.img) {
-    return `<img src="${s.img}" alt="${s.name}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,.35))">`;
-  }
-  return s.emoji;
+function getSkinEmoji(skinId) {
+  return getSkinById(skinId).emoji;
 }
 
 function getBoxTotalWeight(boxId) {
@@ -491,12 +488,7 @@ function runGambleAnimation(wonSkin, currentBoxId, onComplete) {
     el.className = `gamble-modal__item gamble-modal__item--${s.rarity}`;
 
     const emojiEl = document.createElement("div");
-    if (s.img) {
-      // Need smaller drop shadow for gamble modal item
-      emojiEl.innerHTML = `<img src="${s.img}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))">`;
-    } else {
-      emojiEl.textContent = s.emoji;
-    }
+    emojiEl.textContent = s.emoji;
 
     const nameEl = document.createElement("div");
     nameEl.className = "gamble-modal__item-name";
@@ -552,8 +544,8 @@ function spendCookies(amount) {
   state.cookies = Math.max(0, state.cookies - amount);
 }
 
-function save() {
-  const payload = {
+function getSavePayload() {
+  return {
     v: 1,
     cookies: state.cookies,
     totalCookies: state.totalCookies,
@@ -566,6 +558,10 @@ function save() {
     lastSave: nowMs(),
     usedKeys: state.usedKeys,
   };
+}
+
+function save() {
+  const payload = getSavePayload();
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     state.lastSave = payload.lastSave;
@@ -574,6 +570,94 @@ function save() {
     setHint("Impossible de sauvegarder (localStorage).");
   }
   render();
+}
+
+function exportSave() {
+  const payload = getSavePayload();
+  const str = btoa(JSON.stringify(payload));
+
+  const modal = document.getElementById("saveModal");
+  const input = document.getElementById("saveCodeInput");
+  const title = document.getElementById("saveModalTitle");
+
+  if (modal && input && title) {
+    title.textContent = "Exporter ta sauvegarde 💾";
+    input.value = str;
+    input.readOnly = true;
+    modal.classList.add("is-open");
+    input.select();
+    setHint("Code de sauvegarde prêt !");
+
+    // Auto-copy to clipboard
+    try {
+      navigator.clipboard.writeText(str);
+      setHint("Code copié dans le presse-papier !");
+    } catch (e) { }
+  } else {
+    prompt("Copie ce code de sauvegarde :", str);
+  }
+}
+
+function openImportModal() {
+  const modal = document.getElementById("saveModal");
+  const input = document.getElementById("saveCodeInput");
+  const title = document.getElementById("saveModalTitle");
+
+  if (modal && input && title) {
+    title.textContent = "Importer une sauvegarde 📥";
+    input.value = "";
+    input.readOnly = false;
+    input.placeholder = "Colle ton code ici...";
+    modal.classList.add("is-open");
+  } else {
+    const str = prompt("Colle ton code de sauvegarde ici :");
+    if (str) importSave(str);
+  }
+}
+
+function importSave(str) {
+  if (!str) return;
+  try {
+    const decoded = atob(str.trim());
+    const parsed = JSON.parse(decoded);
+
+    if (typeof parsed.cookies !== 'number') throw new Error("Save invalide");
+
+    state.cookies = clamp(Number(parsed.cookies ?? 0), 0, Number.MAX_SAFE_INTEGER);
+    state.totalCookies = clamp(Number(parsed.totalCookies ?? state.cookies ?? 0), 0, Number.MAX_SAFE_INTEGER);
+    state.clickCount = clamp(Number(parsed.clickCount ?? 0), 0, Number.MAX_SAFE_INTEGER);
+
+    for (const u of UPGRADE_DEFS) {
+      const owned = parsed.upgrades?.[u.id]?.owned ?? 0;
+      state.upgrades[u.id] = { owned: clamp(Number(owned), 0, 1e9) };
+    }
+
+    state.unlockedSkins = Array.isArray(parsed.unlockedSkins) ? parsed.unlockedSkins : ["default"];
+    state.usedKeys = Array.isArray(parsed.usedKeys) ? parsed.usedKeys : [];
+    if (!state.unlockedSkins.includes("default")) state.unlockedSkins.unshift("default");
+
+    const skinId = parsed.currentSkinId && SKIN_DEFS.some((s) => s.id === parsed.currentSkinId)
+      ? parsed.currentSkinId
+      : "default";
+    state.currentSkinId = state.unlockedSkins.includes(skinId) ? skinId : "default";
+
+    state.lastSave = nowMs();
+    state.lastLoadedAt = nowMs();
+    state.lastTick = nowMs();
+
+    save();
+    render();
+    buildSkinsList();
+    buildShop();
+
+    setHint("Sauvegarde importée avec succès !");
+
+    const modal = document.getElementById("saveModal");
+    if (modal) modal.classList.remove("is-open");
+  } catch (e) {
+    console.error(e);
+    alert("Code de sauvegarde invalide ou corrompu !");
+  }
 }
 
 function load() {
@@ -926,8 +1010,8 @@ function showBoxInfoPopup(boxId) {
         if (!alreadyHad) state.unlockedSkins.push(won.id);
         state.currentSkinId = won.id;
         const msg = alreadyHad
-          ? `Clé validée ! Tu as tiré ${won.emoji || ""} ${won.name} (déjà possédé) — équipé !`
-          : `Clé validée ! Nouveau skin exclusif: ${won.emoji || ""} ${won.name} !`;
+          ? `Clé validée ! Tu as tiré ${won.emoji} ${won.name} (déjà possédé) — équipé !`
+          : `Clé validée ! Nouveau skin exclusif: ${won.emoji} ${won.name} !`;
         setHint(msg);
 
         const gResult = document.getElementById("gambleResult");
@@ -992,7 +1076,7 @@ function buildShop() {
     if (cps) {
       const t = document.createElement("div");
       t.className = "tag tag--good";
-      t.textContent = `+${fmtShort(cps)}/s`;
+      t.textContent = `+${fmtShort(cps, 1)}/s`;
       meta.appendChild(t);
     }
     if (cpc) {
@@ -1050,17 +1134,17 @@ function render() {
   const cps = getCps();
   const cpc = getCpc();
 
-  if (cookiesEl) cookiesEl.textContent = fmtShort(Math.floor(state.cookies));
-  if (cpsEl) cpsEl.textContent = fmtShort(roundTo(cps, 1));
-  if (cpcEl) cpcEl.textContent = fmtShort(cpc);
-  if (totalEl) totalEl.textContent = `Total: ${fmtShort(Math.floor(state.totalCookies))}`;
+  if (cookiesEl) cookiesEl.textContent = fmtShort(state.cookies, state.cookies < 10 ? 1 : 0);
+  if (cpsEl) cpsEl.textContent = fmtShort(cps, 1);
+  if (cpcEl) cpcEl.textContent = fmtShort(cpc, state.cookies < 100 ? 1 : 0);
+  if (totalEl) totalEl.textContent = `Total: ${fmtShort(state.totalCookies, state.totalCookies < 10 ? 1 : 0)}`;
   if (lastSaveEl) lastSaveEl.textContent = state.lastSave ? formatTime(state.lastSave) : "—";
   if (offlineGainEl)
     offlineGainEl.textContent =
       state.lastOfflineGain == null ? "—" : `+${fmtShort(Math.floor(state.lastOfflineGain))}`;
 
   const cookieEmojiEl = document.getElementById("cookieEmoji");
-  if (cookieEmojiEl) cookieEmojiEl.innerHTML = getSkinIconHTML(state.currentSkinId);
+  if (cookieEmojiEl) cookieEmojiEl.textContent = getSkinEmoji(state.currentSkinId);
 
   // The box tabs and VIP popup handle everything now; btnGamble is hidden.
 
@@ -1123,12 +1207,8 @@ function buildSkinsList() {
       (isUnlocked ? "" : " skin-card--locked");
     card.disabled = !isUnlocked;
     const prob = formatProbabilityForSkin(skin);
-    const iconHTML = skin.img
-      ? `<img src="${skin.img}" alt="${skin.name}" style="width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4))">`
-      : skin.emoji;
-
     card.innerHTML = `
-      <span class="skin-card__emoji">${iconHTML}</span>
+      <span class="skin-card__emoji">${skin.emoji}</span>
       <div class="skin-card__info">
         <div class="skin-card__name">${skin.name}</div>
         <div class="skin-card__rarity skin-card__rarity--${skin.rarity}">${skin.rarity}</div>
@@ -1138,7 +1218,7 @@ function buildSkinsList() {
       e.preventDefault();
       if (!(state.unlockedSkins || ["default"]).includes(id)) return;
       state.currentSkinId = id;
-      setHint(`Skin équipé: ${skin.name} ${skin.emoji || ""}`);
+      setHint(`Skin équipé: ${skin.name} ${skin.emoji}`);
       saveDebounced();
       render();
     });
@@ -1188,13 +1268,36 @@ function init() {
 
   if (btnSave) btnSave.addEventListener("click", () => save());
 
-  if (btnReset)
-    btnReset.addEventListener("click", () => {
-      const ok = confirm("Reset la sauvegarde ? (irréversible)");
-      if (!ok) return;
-      resetAll();
-      saveDebounced();
+  const btnExport = document.getElementById("btnExport");
+  if (btnExport) btnExport.addEventListener("click", () => exportSave());
+
+  const btnImport = document.getElementById("btnImport");
+  if (btnImport) btnImport.addEventListener("click", () => openImportModal());
+
+  const saveModalClose = document.getElementById("saveModalClose");
+  const saveModalConfirm = document.getElementById("saveModalConfirm");
+  const saveModal = document.getElementById("saveModal");
+
+  if (saveModalClose) {
+    saveModalClose.addEventListener("click", () => saveModal.classList.remove("is-open"));
+  }
+
+  if (saveModalConfirm) {
+    saveModalConfirm.addEventListener("click", () => {
+      const input = document.getElementById("saveCodeInput");
+      if (input && !input.readOnly) {
+        importSave(input.value);
+      } else {
+        saveModal.classList.remove("is-open");
+      }
     });
+  }
+  btnReset.addEventListener("click", () => {
+    const ok = confirm("Reset la sauvegarde ? (irréversible)");
+    if (!ok) return;
+    resetAll();
+    saveDebounced();
+  });
 
   const btnGamble = document.getElementById("btnGamble");
   const gambleResult = document.getElementById("gambleResult");
@@ -1221,8 +1324,8 @@ function init() {
           if (!alreadyHad) state.unlockedSkins.push(won.id);
           state.currentSkinId = won.id;
           const msg = alreadyHad
-            ? `Tu as tiré ${won.emoji || won.name} (déjà possédé) — équipé !`
-            : `Nouveau skin débloqué: ${won.emoji || won.name} !`;
+            ? `Tu as tiré ${won.emoji} ${won.name} (déjà possédé) — équipé !`
+            : `Nouveau skin débloqué: ${won.emoji} ${won.name} !`;
           setHint(msg);
 
           if (gambleResult) gambleResult.textContent = msg;

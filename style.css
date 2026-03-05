@@ -144,9 +144,8 @@ body {
 
 .panel--cookie {
   align-items: center;
-  gap: 18px;
-  justify-content: flex-start;
-  padding-top: 40px;
+  gap: 12px;
+  justify-content: center;
 }
 
 .panel--shop {
@@ -205,6 +204,7 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+  margin-top: -740px;
 }
 
 .stat {
@@ -257,12 +257,7 @@ body {
 
 .cookie__emoji {
   font-size: clamp(80px, 18vw, 140px);
-  width: clamp(80px, 18vw, 140px);
-  height: clamp(80px, 18vw, 140px);
   line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   filter: drop-shadow(0 8px 24px rgba(0, 0, 0, .35));
   transition: transform .1s ease;
 }
@@ -284,6 +279,7 @@ body {
   font-size: 13px;
   text-align: center;
   width: 100%;
+  color: white;
 }
 
 .panel__head {
@@ -643,13 +639,7 @@ body {
 }
 
 .skin-card__emoji {
-  font-size: 28px;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  font-size: 24px;
   line-height: 1
 }
 
@@ -881,4 +871,9 @@ body {
     opacity: 1;
     transform: scale(1)
   }
+}
+
+.cookie_img {
+  width: 50%;
+  height: 50%;
 }

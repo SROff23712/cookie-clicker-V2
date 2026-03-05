@@ -4,12 +4,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cookie Clicker (mini)</title>
+  <title>SROff Clicker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./style.css" />
-<script>window.onerror = function(m, s, l, c, e) { alert(Error:  at line \); };</script></head>
+  <script>window.onerror = function (m, s, l, c, e) { alert(Error: at line \); };</script>
+</head>
 
 <body>
   <div class="app">
@@ -17,14 +18,17 @@
       <div class="brand">
         <span class="brand__dot" aria-hidden="true"></span>
         <div class="brand__text">
-          <div class="brand__title">Cookie Clicker 🍪</div>
-          <div class="brand__sub">mini version — sauvegarde auto 💾</div>
+          <div class="brand__title">SROff Clicker 🍪</div>
+          <div class="brand__sub">SROff Edition — Import / Export 💾</div>
         </div>
       </div>
 
       <div class="topbar__right">
-        <button class="btn btn--ghost" id="btnSave" type="button" title="Sauvegarder">
-          Sauvegarder
+        <button class="btn btn--ghost" id="btnExport" type="button" title="Exporter la sauvegarde">
+          📤 Export
+        </button>
+        <button class="btn btn--ghost" id="btnImport" type="button" title="Importer une sauvegarde">
+          📥 Import
         </button>
         <button class="btn btn--danger" id="btnReset" type="button" title="Réinitialiser">
           Reset
@@ -50,7 +54,7 @@
         </div>
 
         <button class="cookie cookie--emoji" id="cookieBtn" type="button" aria-label="Cliquer le cookie">
-          <span class="cookie__emoji" id="cookieEmoji">🍪</span>
+          <img src="assets/cookie.png" alt="Cookie" class="cookie_img" id="cookieEmoji" />
           <span class="cookie__label">CLIQUE</span>
         </button>
 
@@ -61,7 +65,7 @@
         <!-- Navigation tabs -->
         <div class="nav-tabs" id="navTabs">
           <button type="button" class="nav-tab nav-tab--active" data-tab="upgrades">⚙️ Améliorations</button>
-          <button type="button" class="nav-tab" data-tab="boxes">📦 Achats</button>
+          <button type="button" class="nav-tab" data-tab="boxes">📦 Shop</button>
           <button type="button" class="nav-tab" data-tab="skins">🎨 Skins</button>
         </div>
 
@@ -154,6 +158,29 @@
       <button class="btn gamble-modal__close" id="gambleModalClose" type="button">
         Continuer
       </button>
+    </div>
+  </div>
+
+  <div class="gamble-modal" id="saveModal" aria-hidden="true">
+    <div class="gamble-modal__backdrop"></div>
+    <div class="gamble-modal__box">
+      <div class="gamble-modal__title" id="saveModalTitle">Gestionnaire de Sauvegarde</div>
+
+      <div style="margin: 1rem 0;">
+        <textarea id="saveCodeInput"
+          style="width: 100%; height: 120px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 12px; color: #fff; padding: 12px; font-family: monospace; font-size: 12px; resize: none; outline: none;"
+          placeholder="Colle ton code ici..."></textarea>
+      </div>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="btn" id="saveModalConfirm" type="button"
+          style="background: var(--accent); border-color: var(--accent);">
+          Valider
+        </button>
+        <button class="btn btn--ghost" id="saveModalClose" type="button">
+          Fermer
+        </button>
+      </div>
     </div>
   </div>
 
